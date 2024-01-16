@@ -18,7 +18,7 @@ exogenously given population in 10 food energy categories, based on regional die
 Future trends in food demand are derived from a cross-country regression analysis,
 based on future scenarios on GDP and population growth.
 
-https://www.pik-potsdam.de/research/projects/activities/land-use-modelling/magpie
+https://www.pik-potsdam.de/en/institute/departments/activities/land-use-modelling/magpie
 
 ## DOCUMENTATION
 A framework description paper has been published in
