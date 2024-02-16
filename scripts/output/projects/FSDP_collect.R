@@ -241,7 +241,7 @@ var_reg <- c(indicators_main,
              "Resources|Nitrogen|Pollution|Surplus|+|Non-agricultural land",
              "Resources|Water|Withdrawal|Agriculture",
              "Resources|Land Cover|Cropland|Area equipped for irrigation",
-             
+             "Value|Bioeconomy Demand",
              ### Maps
              "Costs",
              "Population",
