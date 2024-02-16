@@ -45,28 +45,28 @@ if (length(unique(x)) == 1) rev <- unique(x) else stop("version prefix is not id
 # Append health impacts reports
 hi_datasets_path <- "/p/projects/magpie/data/FSEC_healthImpactsDatasets_raw"
 if (dir.exists(hi_datasets_path)) {
-  
+
   hi_datasets      <- list.files(hi_datasets_path)
   hi_versionToUse  <- grep(rev, hi_datasets, value = TRUE)
-  
+
   if (length(hi_versionToUse) == 0) {
-    
+
     message("No corresponding version ID was found within the health impacts datasets. Using the latest available.")
-    
+
     highestVersionNr <- max(as.numeric(str_extract(hi_datasets, "(?<=v)(.*?)(?=_)")))
     hi_versionToUse <- grep(paste0("v", highestVersionNr), hi_datasets, value = TRUE)
-    
+
   } else if (length(hi_versionToUse) >= 2) {
     stop("Duplicated version IDs were found in the health impacts datasets, only one is expected.")
   }
-  
+
   hi_versionToUse_path <- file.path(hi_datasets_path, hi_versionToUse)
   hi_gdx <- suppressWarnings(readGDX(hi_versionToUse_path))
-  
+
   .appendHealthImpacts <- function(.x) {
     cfg <- gms::loadConfig(file.path(.x, "config.yml"))
     title <- cfg$title
-    
+
     message("Appending health impact report: ", title)
     tryCatch(
       expr = {
@@ -77,34 +77,34 @@ if (dir.exists(hi_datasets_path)) {
     )
   }
   lapply(X = outputdir, FUN = .appendHealthImpacts)
-  
+
 } else {
   message("The directory storing health impacts datasets wasn't found. Skipping health impacts.")
 }
 
 magicc7_datasets_path <- "/p/projects/magpie/data/FSEC_magicc7Datasets_raw"
 if (dir.exists(magicc7_datasets_path)) {
-  
+
   magicc7_datasets <- list.files(magicc7_datasets_path)
   magicc7_versionToUse  <- grep(rev, magicc7_datasets, value = TRUE)
-  
+
   if (length(magicc7_versionToUse) == 0) {
-    
+
     message("No corresponding version ID was found within the MAGICC7 datasets. Using the latest available.")
-    
+
     highestVersionNr <- max(as.numeric(str_extract(magicc7_datasets, "(?<=v)(.*?)(?=_)")))
     magicc7_versionToUse <- grep(paste0("v", highestVersionNr), magicc7_datasets, value = TRUE)
-    
+
   } else if (length(magicc7_versionToUse) >= 2) {
     stop("Duplicated version IDs were found in the MAGICC7 datasets, only one is expected.")
   }
-  
+
   magicc7_versionToUse_path <- file.path(magicc7_datasets_path, magicc7_versionToUse)
-  
+
   .appendMAGICC7 <- function(.x) {
     cfg <- gms::loadConfig(file.path(.x, "config.yml"))
     title <- cfg$title
-    
+
     tryCatch(
       expr = {
         appendReportMAGICC7(resultsPath = magicc7_versionToUse_path, scenario = title, dir = .x)
@@ -114,7 +114,7 @@ if (dir.exists(magicc7_datasets_path)) {
     )
   }
   lapply(X = outputdir, FUN = .appendMAGICC7)
-  
+
 } else {
   message("The directory storing MAGICC7 datasets wasn't found. Skipping AR6 global warming calculations.")
 }
@@ -150,6 +150,7 @@ var_reg <- c(indicators_main,
              "Nutrition|Calorie Supply|+|Livestock products",
              "Demand|++|Crops",
              "Demand|Food|+|Crops",
+             "Demand|Feed|+|Crops",
              "Demand|Feed|+|Pasture",
              "Demand|Feed|+|Secondary products",
              "Demand|Feed|+|Crop residues",
@@ -177,20 +178,19 @@ var_reg <- c(indicators_main,
              "Resources|Land Cover|+|Urban Area",
              "Resources|Land Cover|Cropland|+|Croparea",
              "Resources|Land Cover|Cropland|+|Fallow Land",
-             "Resources|Land Cover|Cropland|Croparea|+|Cereals",
-             "Resources|Land Cover|Cropland|Croparea|+|Oil crops",
-             "Resources|Land Cover|Cropland|Croparea|+|Sugar crops",
-             "Resources|Land Cover|Cropland|Croparea|+|Fruits Vegetables Nuts",
+             "Resources|Land Cover|Cropland|Croparea|Crops|+|Cereals",
              "Resources|Land Cover|Cropland|Croparea|Crops|Cereals|+|Maize",
              "Resources|Land Cover|Cropland|Croparea|Crops|Cereals|+|Rice",
              "Resources|Land Cover|Cropland|Croparea|Crops|Cereals|+|Temperate cereals",
              "Resources|Land Cover|Cropland|Croparea|Crops|Cereals|+|Tropical cereals",
+             "Resources|Land Cover|Cropland|Croparea|Crops|+|Oil crops",
              "Resources|Land Cover|Cropland|Croparea|Crops|Oil crops|+|Cotton seed",
              "Resources|Land Cover|Cropland|Croparea|Crops|Oil crops|+|Groundnuts",
              "Resources|Land Cover|Cropland|Croparea|Crops|Oil crops|+|Oilpalms",
              "Resources|Land Cover|Cropland|Croparea|Crops|Oil crops|+|Other oil crops incl rapeseed",
              "Resources|Land Cover|Cropland|Croparea|Crops|Oil crops|+|Soybean",
              "Resources|Land Cover|Cropland|Croparea|Crops|Oil crops|+|Sunflower",
+             "Resources|Land Cover|Cropland|Croparea|Crops|+|Sugar crops",
              "Resources|Land Cover|Cropland|Croparea|Crops|Sugar crops|+|Sugar beet",
              "Resources|Land Cover|Cropland|Croparea|Crops|Sugar crops|+|Sugar cane",
              "Resources|Land Cover|Cropland|Croparea|Crops|Other crops|+|Fruits Vegetables Nuts",
@@ -537,13 +537,13 @@ var_reg <- c(indicators_main,
              "SDG|SDG15|Biological nitrogen fixation on cropland",
              "SDG|SDG15|Non-agricultural land share",
              "SDG|SDG15|Other natural land share",
-             
+
              "Resources|Nitrogen|Pollution|Surplus|+|Cropland",
              "Resources|Nitrogen|Pollution|Surplus|+|Pasture",
              "Resources|Nitrogen|Pollution|Surplus|+|Animal Waste Management",
              "Resources|Nitrogen|Pollution|Surplus|+|Non-agricultural land",
              "Resources|Water|Withdrawal|Agriculture",
-             
+
              "Emissions|CH4_GWP*AR6|Land",
              "Emissions|CH4_GWP*AR6|Land|+|Agriculture",
              "Emissions|CH4_GWP*AR6|Land|+|Biomass Burning",
@@ -697,10 +697,10 @@ var_reg <- c(indicators_main,
              "Emissions|NO3-|Land|Agriculture|Agricultural Soils|Inorganic Fertilizers|+|Cropland",
              "Emissions|NO3-|Land|Agriculture|Agricultural Soils|Inorganic Fertilizers|+|Pasture",
              "Emissions|NO3-|Land|Biomass Burning|+|Burning of Crop Residues",
-             
+
              "SDG|SDG15|Afforestation",
-             
-             
+
+
              "Nutrition|Anthropometrics|People normalweight",
              "Nutrition|Anthropometrics|People obese",
              "Nutrition|Anthropometrics|People overweight",
@@ -745,7 +745,7 @@ var_iso <- unique(var_iso)
 for (i in 1:length(outputdir)) {
   print(paste("Processing",outputdir[i]))
   cfg <- gms::loadConfig(file.path(outputdir[i], "config.yml"))
-  
+
   ### regional level outputs
   rep <- file.path(outputdir[i], "report.rds")
   if(file.exists(rep)) {
@@ -754,14 +754,14 @@ for (i in 1:length(outputdir)) {
     a <- droplevels(a)
     reg <- rbind(reg, a)
   } else missing <- c(missing,rep)
-  
+
   ### ISO and Grid level outputs
   ## only for BAU and SDP in 2020 and 2050 to save time and storage
   years <- c(2020, 2050)
   scen <- c("BAU", "FSDP", "SSP2fsdp")
   thisScen <- unlist(strsplit(cfg$title, "_"))[3]
   if (thisScen %in% scen) {
-    
+
     ### ISO level outputs
     rep <- file.path(outputdir[i], "report_iso.rds")
     if(file.exists(rep)) {
@@ -770,10 +770,10 @@ for (i in 1:length(outputdir)) {
       a <- droplevels(a)
       iso <- rbind(iso, a)
     } else missing <- c(missing,rep)
-    
+
     ###Grid level outputs
     y     <- NULL
-    
+
     ## BII
     nc_file <- file.path(outputdir[i], "cell.bii_0.5.mz") #Note the "_" instead of "-"
     if(file.exists(nc_file)) {
@@ -783,14 +783,14 @@ for (i in 1:length(outputdir)) {
       a <- addLocation(a)
       y <- mbind(y,a)
     } else missing <- c(missing,nc_file)
-    
+
     ## Gridded temperature data from ISIMIP archive for relevant SSP/RCP
     rcp <- switch(thisScen,
                   "BAU"      = "ssp460",
                   "FSDP"     = "ssp119",
                   "SSP2fsdp" = "ssp245",
                   "Invalid case")
-    
+
     nc_file <- "./input/FSEC_GlobalSurfaceTempPerRCP_v3_04-05-23/FSEC_GlobalSurfaceTempPerRCP_v3_04-05-23.mz"
     if (file.exists(nc_file)) {
       a <- read.magpie(nc_file)[, years, rcp]
@@ -799,7 +799,7 @@ for (i in 1:length(outputdir)) {
       a <- addLocation(a)
       y <- mbind(y, a)
     } else missing <- c(missing, nc_file)
-    
+
     ## Crop diversity
     nc_file <- file.path(outputdir[i], paste0(cfg$title, "-CropDiversityGridded.mz"))
     if(file.exists(nc_file)) {
@@ -809,7 +809,7 @@ for (i in 1:length(outputdir)) {
       a <- addLocation(a)
       y <- mbind(y,a)
     } else missing <- c(missing,nc_file)
-    
+
     ## land patterns Mha
     nc_file <- file.path(outputdir[i], "cell.land_0.5.mz")
     if(file.exists(nc_file)) {
@@ -819,7 +819,7 @@ for (i in 1:length(outputdir)) {
       a <- addLocation(a)
       y <- mbind(y,a)
     } else missing <- c(missing,nc_file)
-    
+
     ## land patterns share
     nc_file <- file.path(outputdir[i], "cell.land_0.5_share.mz")
     if(file.exists(nc_file)) {
@@ -830,7 +830,7 @@ for (i in 1:length(outputdir)) {
       a <- addLocation(a)
       y <- mbind(y,a)
     } else missing <- c(missing,nc_file)
-    
+
     ## croparea shares
     nc_file <- file.path(outputdir[i], "cell.croparea_0.5_share.mz")
     if(file.exists(nc_file)) {
@@ -844,7 +844,7 @@ for (i in 1:length(outputdir)) {
       a <- addLocation(a)
       y <- mbind(y,a)
     } else missing <- c(missing,nc_file)
-    
+
     ## Nitrogen
     nc_file <- file.path(outputdir[i], paste(cfg$title, "nutrientSurplus_intensity.mz", sep = "-"))
     if(file.exists(nc_file)) {
@@ -854,7 +854,7 @@ for (i in 1:length(outputdir)) {
       a <- addLocation(a)
       y <- mbind(y,a)
     } else missing <- c(missing, nc_file)
-    
+
     ## Water
     nc_file <- file.path(outputdir[i], "watStressViolations.mz")
     if (file.exists(nc_file)) {
@@ -864,7 +864,7 @@ for (i in 1:length(outputdir)) {
       a <- addLocation(a)
       y <- mbind(y, a)
     } else missing <- c(missing, nc_file)
-    
+
     nc_file <- file.path(outputdir[i], "efvVolume.mz")
     if (file.exists(nc_file)) {
       a <- read.magpie(nc_file)[, years, ]
@@ -873,7 +873,7 @@ for (i in 1:length(outputdir)) {
       a <- addLocation(a)
       y <- mbind(y, a)
     } else missing <- c(missing, nc_file)
-    
+
     nc_file <- file.path(outputdir[i], "efvVolume_ha.mz")
     if (file.exists(nc_file)) {
       a <- read.magpie(nc_file)[, years, ]
@@ -882,19 +882,19 @@ for (i in 1:length(outputdir)) {
       a <- addLocation(a)
       y <- mbind(y, a)
     } else missing <- c(missing, nc_file)
-    
+
     #add dimensions
-    
+
     if (is.null(y)) {
       message("Scenario: ", cfg$title, " contained none of the cellular output data.")
     } else {
       y <- add_dimension(y, dim = 3.1, add = "scenario", nm = gsub(".", "_", cfg$title, fixed = TRUE))
       y <- add_dimension(y, dim = 3.1, add = "model", nm = "MAgPIE")
       getSets(y, fulldim = FALSE)[2] <- "period"
-      
+
       #save as data.frame with xy coordinates
       y <- as.data.table(as.data.frame(y, rev = 3))
-      
+
       #bind together
       grid <- rbind(grid, y)
     }
