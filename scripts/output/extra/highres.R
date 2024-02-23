@@ -39,7 +39,7 @@ source("scripts/start_functions.R")
 
 highres <- function(cfg) {
   #lock the model folder
-  lockId <- gms::model_lock(timeout1 = 1)
+  lockId <- gms::model_lock(timeout1 = 24)
   withr::defer(gms::model_unlock(lockId))
 
   if(any(!(modelstat(gdx) %in% c(2,7)))) stop("Modelstat different from 2 or 7 detected")
@@ -74,9 +74,9 @@ highres <- function(cfg) {
       #list files with sftp command
       path <- paste0(sub("scp://","sftp://",repo),"/")
       h <- try(curl::new_handle(verbose = debug, .list = repositories[[repo]], ftp_use_epsv = TRUE, dirlistonly = TRUE), silent = TRUE)
-      con <- curl::curl(url = path, "r", handle = h)
+      con <- try(curl::curl(url = path, "r", handle = h), silent = TRUE)
       dat <- try(readLines(con), silent = TRUE)
-      close(con)
+      try(close(con), silent = TRUE)
       found <- c(found,grep(glob2rx(file),dat,value = T))
     } else if (dir.exists(repo)) {
       dat <- list.files(repo)
